@@ -1,18 +1,18 @@
 #CSCI 445 Final Project
 
-##Week 1 Assignments:
+## Week 1 Assignments:
 
-##Person 1: Jacob
+## Person 1: Jacob
 marker odometry adjustment
 rotating about the marker
 
 
-##Person 2: Preston
+## Person 2: Preston
 interacting with yml file and building path-following
 human does path decision-making on house image
 obstacle avoidance?
 
-##Person 3: Ankur
+## Person 3: Ankur
 integrating localization + camera data together and moving robot along some specified path..
 softer assignment of obstacle avoidance?
 
