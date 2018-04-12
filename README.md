@@ -1,4 +1,4 @@
-#CSCI 445 Final Project
+# CSCI 445 Final Project
 
 ## Week 1 Assignments:
 
