@@ -33,9 +33,11 @@ class Run:
         self.time.sleep(5)
         self.create.drive_direct(0, 0)
 
-        self.penholder.go_to(0.0)
+        # self.penholder.go_to(0.0)
+
         r, l, time = self.penholder.rotate_around_marker(self.base_speed, 2*math.pi)
-        self.create.drive_direct(r, l)
+        print("speed vals: ",r,l, time)
+        self.create.drive_direct(23.5, l)
         self.time.sleep(time)
         self.create.drive_direct(self.base_speed, self.base_speed)
 

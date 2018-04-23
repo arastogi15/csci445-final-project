@@ -7,13 +7,13 @@ import math
 import odometry
 
 class PenHolder:
-    def __init__(self, number, radius, length, factory):
+    def __init__(self, number, radius, length):
         self.servo = Servo(number)
-        self.factory = factory.create_c
         self.arm = radius+length
         self.odometry = odometry.Odometry()
         self.length = length
         self.radius = radius
+        print("created pen holder")
 
 
     def go_to(self, height):
@@ -49,7 +49,7 @@ class PenHolder:
         circle_time = (2*math.pi)*(self.length + wb)/base_speed
         sector_time = circle_time * sector
         return rw_speed, lw_speed, sector_time
-        
+
 
 
 
