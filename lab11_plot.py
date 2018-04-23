@@ -34,10 +34,54 @@ if __name__ == "__main__":
                 result = np.vstack([result, s])
 
         ax.plot(result[:,0], result[:,1], path.color)
-
+    plotOutput = []
     # draw lines
     for line in img.lines:
+        print([line.u[0], line.v[0]], [line.u[1], line.v[1]], line.color)
+        plotOutput.append(line)
         plt.plot([line.u[0], line.v[0]], [line.u[1], line.v[1]], line.color)
 
+    print("white space placeholder")
+    outputFile = open("lineOutput.txt", "w+")
+    for i in plotOutput:
+        print([i.u[0], i.v[0]], [i.u[1], i.v[1]], i.color)
+        
+    print("Second white space placeholder")
+    for i in plotOutput:
+        print(i.u[0], i.v[0], i.u[1], i.v[1], i.color)
+        outputFile.write(str(i.u[0]))
+        outputFile.write(" ")
+        outputFile.write(str(i.v[0]))
+        outputFile.write(" ")
+        outputFile.write(str(i.u[1]))
+        outputFile.write(" ")
+        outputFile.write(str(i.v[1]))
+        outputFile.write(" ")
+        outputFile.write(str(i.color))
+        outputFile.write("\n")
+    outputFile.close()
+    
+    print("Finished Writing to File, now attempting to parse")
+    
+    input = []
+    
+    iFile = open("lineOutput.txt", "r")
+    for line in iFile:
+        words = line.split()
+        input.append(((words[0], words[1]), (words[2], words[3]), words[4]))
+    for i in input:
+        print(i)
+    
+    numberForm = []
+    for i in input:
+        numberForm.append(i)
+    print("Attempting number form output")
+    counter =0
+    for i in numberForm:
+        print(numberForm[counter][0][0], numberForm[counter][0][1], numberForm[counter][1][0], numberForm[counter][1][1], numberForm[counter][2])
+        counter+=1
+    
+    
+    
     # show the output
     plt.show()

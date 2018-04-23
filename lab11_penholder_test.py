@@ -2,7 +2,8 @@
 Example to use the pen holder
 Use "python3 run.py --sim lab11_penholder_test" to execute
 """
-
+import math
+from pyCreate2.robot import pen_holder
 
 class Run:
     def __init__(self, factory):
@@ -14,6 +15,7 @@ class Run:
         self.create = factory.create_create()
         self.time = factory.create_time_helper()
         self.penholder = factory.create_pen_holder()
+        self.base_speed = 100
 
     def run(self):
         self.create.start()
@@ -27,14 +29,14 @@ class Run:
 
         self.penholder.go_to(-0.025)
 
-        self.create.drive_direct(100, 100)
+        self.create.drive_direct(self.base_speed, self.base_speed)
         self.time.sleep(5)
         self.create.drive_direct(0, 0)
 
         self.penholder.go_to(0.0)
-
-        self.create.drive_direct(100, 100)
-        self.time.sleep(5)
-        self.create.drive_direct(0, 0)
+        r, l, time = self.penholder.rotate_around_marker(self.base_speed, 2*math.pi)
+        self.create.drive_direct(r, l)
+        self.time.sleep(time)
+        self.create.drive_direct(self.base_speed, self.base_speed)
 
         self.create.stop()
