@@ -1,25 +1,33 @@
 # CSCI 445 Final Project
 
+## Roadmap from 04/22/2018
+
+
+
+
 ## Week 1 Assignments:
 
 ## Person 1: Jacob
-marker odometry adjustment
-rotating about the marker
+- marker odometry adjustment
+- rotating about the marker
 
 
 ## Person 2: Preston
-interacting with yml file and building path-following
-human does path decision-making on house image
-obstacle avoidance?
-
-## Person 3: Ankur
-integrating localization + camera data together and moving robot along some specified path..
-softer assignment of obstacle avoidance?
+- interacting with yml file and building path-following
+- human does path decision-making on house image
+- obstacle avoidance?
 
 Obstacle avoidance:
-paths that exist
-do calculations for which paths are affected and how
-maybe determine robot’s course of action in these situations
+- paths that exist
+- do calculations for which paths are affected and how
+- maybe determine robot’s course of action in these situations
+
+## Person 3: Ankur
+- integrating localization + camera data together and moving robot along some specified path..
+- softer assignment of obstacle avoidance?
+
+
+
 
 
 
