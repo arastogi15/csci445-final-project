@@ -60,6 +60,8 @@ class PenHolder:
         vrep.simxSetFloatSignal(self._clientID, 'paintingColorB', b,
             vrep.simx_opmode_oneshot_wait)
 
+    # Takes in marker coordinates and maps them to what robot should be going to
+    # NOTE: just call this on list of waypoints (probs should work)
     def translate_coords_to_robot(self, w):
         #y - armcos(theta); x - armsin(theta)
         curr_theta = self.odometry.theta
