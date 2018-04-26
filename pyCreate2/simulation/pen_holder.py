@@ -67,11 +67,13 @@ class PenHolder:
         curr_theta = self.odometry.theta
         distance_to_w = math.sqrt(math.pow(w[0] - self.odometry.x, 2) + math.pow(w[1] - self.odometry.y, 2))
         distance_to_actual = math.sqrt(math.pow(distance_to_w, 2)  - math.pow(self.arm, 2))
-        total_theta = curr_theta + math.atan2(waypoint[1] - self.odometry.y, waypoint[0] - self.odometry.x)
+        total_theta = curr_theta + math.atan2(w[1] - self.odometry.y, w[0] - self.odometry.x)
         x_ = self.odometry.x + distance_to_actual * math.cos(total_theta)
         y_ = self.odometry.y + distance_to_actual * math.sin(total_theta)
         return [x_,y_]
 
+    # Takes in base speed of turning and and rotates clockwise around the set point. 
+    # NOTE: may need to do some work on figuring out how much to turn the robot
     def rotate_around_marker(self, base_speed, angle):
         print("starting rotation")
         wb = self.radius*2

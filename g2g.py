@@ -18,7 +18,7 @@ class Run:
         self.servo = factory.create_servo()
         self.odometry = odometry.Odometry()
         self.penholder = factory.create_pen_holder()
-
+        self.base_speed = 100
 
     def run(self):
         self.create.start()
@@ -63,35 +63,48 @@ class Run:
                 break
 
             print("test")
+            # Next marker points
             goal_x = float(points[index].xEnd)
             goal_y = float(points[index].yEnd)
+
+            # Corresponding robot points
+            robot_coords = self.penholder.translate_coords_to_robot([goal_x, goal_y])
+            robot_x = robot_coords[0]
+            robot_y = robot_coords[1]
+
             # fun comment
 
-            print(goal_x)
-            print(goal_y)
+            print(robot_x)
+            print(robot_y)
             print("odometry")
             print(self.odometry.x)
             print(self.odometry.y)
             print(self.odometry.theta)
 
-            theta_error = self.odometry.theta - math.atan2(goal_y - self.odometry.y, goal_x - self.odometry.x) % (2*3.14)
-            dist_error = math.sqrt(math.pow(goal_x - self.odometry.x, 2) + math.pow(goal_y - self.odometry.y, 2))
+            theta_error = self.odometry.theta - math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) % (2*3.14)
+            dist_error = math.sqrt(math.pow(robot_x - self.odometry.x, 2) + math.pow(robot_y - self.odometry.y, 2))
             print("theta error: %f" % theta_error)
             print("dist error: %f" % dist_error)
 
             while abs(theta_error) > 0.05:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
-                theta_error = math.atan2(goal_y - self.odometry.y, goal_x - self.odometry.x) - self.odometry.theta
+                theta_error = math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta
                 clamped_theta_error = max(min(60*theta_error, 100), -100)
-                self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
+                print("starting rotation")
+                wb = self.penholder.radius*2
+                ratio = self.penholder.length/(self.penholder.length + wb)
+                rw_speed = self.base_speed*ratio
+                lw_speed = self.base_speed
+                # self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
+                self.create.drive_direct(rw_speed, lw_speed)
                 self.time.sleep(0.2)
 
             while dist_error > 0.1:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 print("dist error: %f" % dist_error)
-                dist_error = math.sqrt(math.pow(goal_x - self.odometry.x, 2) + math.pow(goal_y - self.odometry.y, 2))
+                dist_error = math.sqrt(math.pow(robot_x - self.odometry.x, 2) + math.pow(robot_y - self.odometry.y, 2))
                 clamped_dist_error = max(min(300*dist_error, 100), -100)
                 self.create.drive_direct(int(clamped_dist_error), int(clamped_dist_error))
                 self.time.sleep(0.01)
