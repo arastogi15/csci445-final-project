@@ -35,6 +35,10 @@ class Run:
         start_time = self.time.time()
         end_time = self.time.time()+300
 
+
+        # ORDER:
+        # Get to bottom left of door.
+        # Draws door clockwise along segments (referring to segment order, not rotation), should then go left for bottom segment, turn around and go right...
         index = 0
         # points = [ [1,0, "red"], [1,1,"blue"], [2,1,"blue"]]
         # points = [ [1,0, "red"], [1,1,"red"]]
