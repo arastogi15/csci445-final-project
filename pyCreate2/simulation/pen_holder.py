@@ -60,10 +60,14 @@ class PenHolder:
         vrep.simxSetFloatSignal(self._clientID, 'paintingColorB', b,
             vrep.simx_opmode_oneshot_wait)
 
-    def translate_coords(self, w):
-        theta = self.odometry.theta
-        y_ = w[1]-self.arm*math.sin(90-theta)
-        x_ = w[0]+self.arm*math.cos(90-theta)
+    def translate_coords_to_robot(self, w):
+        #y - armcos(theta); x - armsin(theta)
+        curr_theta = self.odometry.theta
+        distance_to_w = math.sqrt(math.pow(w[0] - self.odometry.x, 2) + math.pow(w[1] - self.odometry.y, 2))
+        distance_to_actual = math.sqrt(math.pow(distance_to_w, 2)  - math.pow(self.arm, 2))
+        total_theta = curr_theta + math.atan2(waypoint[1] - self.odometry.y, waypoint[0] - self.odometry.x)
+        x_ = self.odometry.x + distance_to_actual * math.cos(total_theta)
+        y_ = self.odometry.y + distance_to_actual * math.sin(total_theta)
         return [x_,y_]
 
     def rotate_around_marker(self, base_speed, angle):
