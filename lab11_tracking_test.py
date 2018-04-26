@@ -15,8 +15,7 @@ class Run:
         self.time = factory.create_time_helper()
         self.odometry = odometry.Odometry()
 
-        self.base_speed = 100
-
+        self.base_speed = 60
 
         # sd_{x,y,theta} and rate are only for simulation to change the noise and update rate respectively.
         # They are ignored on the robot.
@@ -26,9 +25,12 @@ class Run:
         predict_x = odometry_data.x
         predict_y = odometry_data.y
         predict_theta = odometry_data.theta
-        print("theta: %d" % predict_theta);
+
+        
 
         if r is not None:
+            print("odometry theta: %f" % predict_theta)
+            print("camera theta: %f" % r["position"]["y"])
             predict_x = alpha*predict_x + (1-alpha)*(r["position"]["x"])
             predict_y = alpha*predict_y + (1-alpha)*(r["position"]["y"])
             predict_theta = alpha*predict_theta + (1-alpha)*(r["orientation"]["y"]) # given in radians...
@@ -54,21 +56,21 @@ class Run:
             create2.Sensor.RightEncoderCounts,
         ])
 
-        while True:
-            
+        # setup to store predicted location
+        p = None 
+        r = self.tracker.query()
+        for i in range(4):
+            if p is not None:
+                print("BEFORE")
+                print(p["x"],p["y"],math.degrees(p["theta"]))
 
-            print("BEFORE")
-            r = self.tracker.query()
-            if r is not None:
-                x = r["position"]["x"]
-                y = r["position"]["y"]
-                yaw = r["orientation"]["y"]
-                print(x,y,math.degrees(yaw))
+            # self.time.sleep(0.0)
+            # r = self.tracker.query()
 
             self.create.drive_direct(self.base_speed, self.base_speed)
-            self.time.sleep(0.5)
-            self.create.drive_direct(self.base_speed, -1*self.base_speed)
-            self.time.sleep(1.8);
+            self.time.sleep(10)
+            self.create.drive_direct(self.base_speed*0.6, -1*0.6*self.base_speed)
+            self.time.sleep(4);
 
             state = self.create.update()
             if state is not None:
@@ -78,7 +80,13 @@ class Run:
 
             p = self.fusePredict(self.odometry, r, 0.5)
             print("AFTER")
+            print(r)
+
             print(p["x"],p["y"],math.degrees(p["theta"]))
             print()
+
+        while True:
+            pass
+
 
 
