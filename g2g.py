@@ -3,12 +3,18 @@ import math
 import odometry
 import lab11_plot
 from lab11_plot import myLine
+from pyCreate2.robot import pen_holder
+
+import pid_controller
+
 class Run:
     def __init__(self, factory):
         self.create = factory.create_create()
         self.time = factory.create_time_helper()
         self.servo = factory.create_servo()
         self.odometry = odometry.Odometry()
+        self.penholder = factory.create_pen_holder()
+
 
     def run(self):
         self.create.start()
@@ -41,6 +47,9 @@ class Run:
         print(self.odometry.x, self.odometry.y)
         # move_forward = False
         # move_theta = False
+        self.penholder.set_color(0.0, 1.0, 0.0)
+        self.penholder.go_to(-0.025)
+
         while self.time.time() < end_time and index < len(points):
 
             state = self.create.update()
