@@ -86,10 +86,13 @@ class Run:
             print("theta error: %f" % theta_error)
             print("dist error: %f" % dist_error)
 
-            while abs(theta_error) > 0.05:
+            # TODO: reduce this range later...
+            while abs(theta_error) > 0.15:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
+                print("Target: %f, %f" % (robot_x, robot_y))
                 theta_error = math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta
+                print("Theta error: %f" % theta_error)
                 clamped_theta_error = max(min(60*theta_error, 100), -100)
                 print("starting rotation")
                 wb = self.penholder.radius*2
@@ -97,7 +100,10 @@ class Run:
                 rw_speed = self.base_speed*ratio
                 lw_speed = self.base_speed
                 # self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
-                self.create.drive_direct(rw_speed, lw_speed)
+                if (theta_error < 0):
+                    self.create.drive_direct(rw_speed, lw_speed)
+                else:
+                    self.create.drive_direct(-rw_speed, -lw_speed)
                 self.time.sleep(0.2)
 
             while dist_error > 0.1:
