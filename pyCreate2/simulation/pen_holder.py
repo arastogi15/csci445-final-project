@@ -62,8 +62,8 @@ class PenHolder:
 
     def translate_coords(self, w):
         theta = self.odometry.theta
-        y_ = w[1]-arm*math.sin*(90-theta)
-        x_ = w[0]+arm*math.cos*(90-theta)
+        y_ = w[1]-self.arm*math.sin(90-theta)
+        x_ = w[0]+self.arm*math.cos(90-theta)
         return [x_,y_]
 
     def rotate_around_marker(self, base_speed, angle):
