@@ -1,7 +1,8 @@
 from pyCreate2 import create2
 import math
 import odometry
-
+import lab11_plot
+from lab11_plot import myLine
 class Run:
     def __init__(self, factory):
         self.create = factory.create_create()
@@ -25,8 +26,16 @@ class Run:
         end_time = self.time.time()+300
 
         index = 0
-        points = [ [1,0, "red"], [1,1,"blue"], [2,1,"blue"]]
+        # points = [ [1,0, "red"], [1,1,"blue"], [2,1,"blue"]]
         # points = [ [1,0, "red"], [1,1,"red"]]
+        points = []
+        iFile = open("hardOutput.txt", "r")
+        for line in iFile:
+            words = line.split()
+            myTempLine = myLine(words[0], words[1], words[2], words[3], words[4], words[5])
+            points.append(myTempLine)
+        for i in points:
+            print(i.xStart, i.yStart, i.xEnd, i.yEnd, i.color, i.type)
 
         print("START")
         print(self.odometry.x, self.odometry.y)
@@ -41,8 +50,8 @@ class Run:
                 break
 
             print("test")
-            goal_x = points[index].xEnd
-            goal_y = points[index].yEnd
+            goal_x = float(points[index].xEnd)
+            goal_y = float(points[index].yEnd)
 
             print(goal_x)
             print(goal_y)
@@ -51,7 +60,7 @@ class Run:
             print(self.odometry.y)
             print(self.odometry.theta)
 
-            theta_error = self.odometry.theta - math.atan2(goal_y - self.odometry.y, goal_x - self.odometry.x)
+            theta_error = self.odometry.theta - math.atan2(goal_y - self.odometry.y, goal_x - self.odometry.x) % (2*3.14)
             dist_error = math.sqrt(math.pow(goal_x - self.odometry.x, 2) + math.pow(goal_y - self.odometry.y, 2))
             print("theta error: %f" % theta_error)
             print("dist error: %f" % dist_error)
