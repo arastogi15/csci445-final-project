@@ -65,7 +65,7 @@ class Run:
         w_translated = []
 
         self.penholder.go_to(0)
-        for w in waypoints:
+        for w in waypoints
             # self.penholder.go_to(-.025)
             w_translated.append(self.penholder.translate_coords(w))
             # self.penholder.go_to(0)
