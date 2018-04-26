@@ -26,6 +26,7 @@ class Run:
         predict_x = odometry_data.x
         predict_y = odometry_data.y
         predict_theta = odometry_data.theta
+        print("theta: %d" % predict_theta);
 
         r = self.tracker.query()
 
@@ -80,8 +81,8 @@ class Run:
                 z = r["position"]["z"]
                 yaw = r["orientation"]["y"]
                 print(x,y,z,math.degrees(yaw))
-            print("AFTER")
             p = self.fusePredict(self.odometry, 0.5)
+            print("AFTER")
             print(p["x"],p["y"],math.degrees(p["theta"]))
             print()
 
