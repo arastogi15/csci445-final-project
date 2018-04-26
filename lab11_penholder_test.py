@@ -65,21 +65,23 @@ class Run:
         w_translated = []
 
         self.penholder.go_to(0)
-        for w in waypoints:
-            # self.penholder.go_to(-.025)
-            w_translated.append(self.penholder.translate_coords(w))
-            # self.penholder.go_to(0)
+        # for w in waypoints:
+        #     # # self.penholder.go_to(-.025)
+        #     # w_translated.append(self.penholder.translate_coords(w))
+        #     # # self.penholder.go_to(0)
 
-        print(w_translated)
 
         start_time = self.time.time()
 
 
-        for waypoint in w_translated:
+        for w in waypoints:
+            waypoint = self.penholder.translate_coords_to_robot(w)
             goal_theta = math.atan2(waypoint[1] - self.odometry.y, waypoint[0] - self.odometry.x)
             print("going to: ", waypoint)
             print("rotate to: ", goal_theta)
-            self.penholder.rotate_around_marker(self.base_speed, goal_theta)
+            rw_speed, lw_speed, time = self.penholder.rotate_around_marker(self.base_speed, goal_theta)
+            self.create.drive_direct(rw_speed, lw_speed)
+            self.time.sleep(time)
             while True:
                 state = self.create.update()
                 if state is not None:
@@ -104,6 +106,7 @@ class Run:
                     distance = math.sqrt(math.pow(waypoint[0] - self.odometry.x, 2) + math.pow(waypoint[1] - self.odometry.y, 2))
                     output_distance = self.pidDistance.update(0, distance, self.time.time())
                     if distance < 0.1:
+                        print("stopping")
                         self.penholder.go_to(0)
                         self.create.drive_direct(0, 0)
                         break
