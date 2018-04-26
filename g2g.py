@@ -65,6 +65,7 @@ class Run:
             print("test")
             goal_x = float(points[index].xEnd)
             goal_y = float(points[index].yEnd)
+            # fun comment
 
             print(goal_x)
             print(goal_y)
