@@ -167,7 +167,7 @@ if __name__ == "__main__":
     ##formatDirections(6)
     
     hardList = []
-    tempHard = myLine(0, 0, .366, .099, "blue", "line")
+    tempHard = myLine(0, -.2, .366, .099, "blue", "line")
     hardList.append(tempHard)
     tempHard = myLine(.366, .099, .366, .455, "blue", "line")
     hardList.append(tempHard)
