@@ -167,7 +167,7 @@ if __name__ == "__main__":
     ##formatDirections(6)
     
     hardList = []
-    tempHard = myLine(0, -.2, .366, .099, "blue", "line")
+    tempHard = myLine(0, -.2, .366, .099, "none", "line")
     hardList.append(tempHard)
     tempHard = myLine(.366, .099, .366, .455, "blue", "line")
     hardList.append(tempHard)
@@ -198,13 +198,13 @@ if __name__ == "__main__":
     tempHard = myLine(.56, 1.3, 1.09, .78, "red", "line")
     hardList.append(tempHard)
     
-    tempHard = myLine(1.09, .78, .8, .85, "red", "bezier")
+    tempHard = myLine(1.09, .78, .8, .85, "none", "bezier")
     hardList.append(tempHard)
-    tempHard = myLine(.8, .85, .55, .9, "red", "bezier")
+    tempHard = myLine(.8, .85, .55, .9, "none", "bezier")
     hardList.append(tempHard)
-    tempHard = myLine(.55, .9, .35, .85, "red", "bezier")
+    tempHard = myLine(.55, .9, .35, .85, "none", "bezier")
     hardList.append(tempHard)
-    tempHard = myLine(.35, .85, .05, .78, "red", "bezier")
+    tempHard = myLine(.35, .85, .05, .78, "none", "bezier")
     hardList.append(tempHard)
     
     tempHard = myLine(.05, .78, .05, .09, "black", "line")
