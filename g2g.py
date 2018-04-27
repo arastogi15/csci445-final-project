@@ -63,7 +63,7 @@ class Run:
         self.penholder.go_to(-0.025)
 
         # SET GAINS!
-        theta_gain = 60
+        theta_gain = 0.5
         dist_gain = 300
 
 
@@ -141,15 +141,16 @@ class Run:
                 print("starting rotation")
                 wb = self.penholder.radius*2
                 ratio = self.penholder.length/(self.penholder.length + wb)
-                rw_speed = self.base_speed*ratio
-                lw_speed = self.base_speed
+                rw_speed = self.base_speed*ratio*theta_gain
+                lw_speed = self.base_speed*theta_gain
                 # self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
 
                 self.create.drive_direct(dir_of_turn*rw_speed, dir_of_turn*lw_speed)
                 self.time.sleep(0.2)
 
-            print("MOVING TO (%f, %f)" % (robot_x, robot_y))
-            while dist_error > 0.05:
+            print("MOVING ROBOT TO (%f, %f)" % (robot_x, robot_y))
+            print("MOVING PEN TO (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
+            while dist_error > 0.10:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 print("dist error: %f" % dist_error)
