@@ -55,9 +55,9 @@ class Run:
 
         # END DEBUG
 
-        if len(segments) > 0:
-            firstMove = myLine(0,-0.2,segments[0].xStart, segments[0].yStart, segments[0].color, "line")
-            segments.insert(0,firstMove)
+        # if len(segments) > 0:
+        #     firstMove = myLine(0,-0.2,segments[0].xStart, segments[0].yStart, segments[0].color, "line")
+        #     segments.insert(0,firstMove)
 
         print("START")
         print(self.odometry.x, self.odometry.y)
@@ -65,7 +65,7 @@ class Run:
         self.penholder.go_to(-0.025)
 
         # SET GAINS!
-        theta_gain = 0.8
+        theta_gain = 0.6
         dist_gain = 300
 
 
@@ -89,6 +89,10 @@ class Run:
         # segments = [s1, s2, s3, s4]
 
         while self.time.time() < end_time and index < len(segments):
+            if segments[index].color == "none":
+                self.penholder.go_to(0.0)
+
+
             # DEFINE SOME ANGLE STUFF
             print("hello")
             print("TARGET: (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
@@ -168,11 +172,16 @@ class Run:
             print("QUICK PAUSE! We got robot: (%f, %f) close to target: (%f, %f)" % (self.odometry.x, self.odometry.y, robot_x, robot_y))
             print("QUICK PAUSE! We got pen to (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
             self.time.sleep(3)
+
+
             # TODO: FIX THIS! LAST ITEM
             if index < len(segments) and (segments[index].color != segments[index+1].color):
                 self.create.drive_direct(0,0)
                 print("COLOR PAUSE!")
                 self.time.sleep(8)
             index += 1
+
+            if segments[index].color == "none":
+                self.penholder.go_to(0.0)
 
         print("done!") # completed moving through all the items...
