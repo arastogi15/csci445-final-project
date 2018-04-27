@@ -40,17 +40,17 @@ class Run:
         # Get to bottom left of door.
         # Draws door clockwise along segments (referring to segment order, not rotation), should then go left for bottom segment, turn around and go right...
         index = 0
-        # points = [ [1,0, "red"], [1,1,"blue"], [2,1,"blue"]]
-        # points = [ [1,0, "red"], [1,1,"red"]]
+        # segments = [ [1,0, "red"], [1,1,"blue"], [2,1,"blue"]]
+        # segments = [ [1,0, "red"], [1,1,"red"]]
         
         # START DEBUG
-        # points = []
+        # segments = []
         # iFile = open("hardOutput.txt", "r")
         # for line in iFile:
         #     words = line.split()
         #     myTempLine = myLine(words[0], words[1], words[2], words[3], words[4], words[5])
-        #     points.append(myTempLine)
-        # for i in points:
+        #     segments.append(myTempLine)
+        # for i in segments:
         #     print(i.xStart, i.yStart, i.xEnd, i.yEnd, i.color, i.type)
 
         # END DEBUG
@@ -79,14 +79,19 @@ class Run:
 #         self.isCompleted = False
         
     
-        p1 = myLine(0,0,0,1,"red", "line")
+        p1 = myLine(0,-0.2,0,1,"red", "line")
         p2 = myLine(0,1,1,1,"red", "line")
         p3 = myLine(1,1,1,0,"red", "line")
         p4 = myLine(1,0,0,0,"red", "line")
 
-        points = [p1, p2, p3, p4]
+        segments = [p1, p2, p3, p4]
 
-        while self.time.time() < end_time and index < len(points):
+        while self.time.time() < end_time and index < len(segments):
+            # DEFINE SOME ANGLE STUFF
+            draw_theta = 3.14/2 + math.atan2(segments[index].yEnd - segments[index].yStart, segments[index].xEnd - segments[index].xStart)
+            robot_x = segments[index].xEnd + 0.2*math.cos(draw_theta)
+            robot_y = segments[index].yEnd + 0.2*math.sin(draw_theta)
+
             state = self.create.update()
             self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
 
@@ -94,14 +99,14 @@ class Run:
                 break
 
             print("test")
-            # Next marker points
-            goal_x = float(points[index].xEnd)
-            goal_y = float(points[index].yEnd)
+            # Next marker segments
+            # goal_x = float(segments[index].xEnd)
+            # goal_y = float(segments[index].yEnd)
 
-            # Corresponding robot points
-            robot_coords = self.penholder.translate_coords_to_robot([goal_x, goal_y])
-            robot_x = robot_coords[0]
-            robot_y = robot_coords[1]
+            # # Corresponding robot segments
+            # robot_coords = self.penholder.translate_coords_to_robot([goal_x, goal_y])
+            # robot_x = robot_coords[0]
+            # robot_y = robot_coords[1]
 
             # fun comment
 
@@ -120,7 +125,7 @@ class Run:
 
             # TODO: reduce this range later...
             print("ROTATING TOWARDS (%f, %f)" % (robot_x, robot_y))
-            while abs(theta_error) > 0.15:
+            while abs(theta_error) > 0.05:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 theta_error = (math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta) % (2*3.14)
@@ -144,7 +149,7 @@ class Run:
                 self.time.sleep(0.2)
 
             print("MOVING TO (%f, %f)" % (robot_x, robot_y))
-            while dist_error > 0.1:
+            while dist_error > 0.05:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 print("dist error: %f" % dist_error)
@@ -154,9 +159,11 @@ class Run:
                 self.time.sleep(0.01)
             
 
-            print("QUICK PAUSE! We got to (%f, %f)" % (robot_x, robot_y))
+            print("QUICK PAUSE! We got robot: (%f, %f) close to target: (%f, %f)" % (self.odometry.x, self.odometry.y, robot_x, robot_y))
+            print("QUICK PAUSE! We got pen to (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
             self.time.sleep(3)
-            if index < len(points)-1 and (points[index].color != points[index+1].color):
+            # TODO: FIX THIS! LAST ITEM
+            if index < len(segments) and (segments[index].color != segments[index+1].color):
                 self.create.drive_direct(0,0)
                 print("COLOR PAUSE!")
                 self.time.sleep(8)
