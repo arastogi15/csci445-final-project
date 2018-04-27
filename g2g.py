@@ -65,7 +65,7 @@ class Run:
         self.penholder.go_to(-0.025)
 
         # SET GAINS!
-        theta_gain = 0.5
+        theta_gain = 0.8
         dist_gain = 300
 
 
@@ -91,7 +91,7 @@ class Run:
         while self.time.time() < end_time and index < len(segments):
             # DEFINE SOME ANGLE STUFF
             print("hello")
-            print(segments[index].yEnd - segments[index].yStart)
+            print("TARGET: (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
             print(segments[index].xEnd - segments[index].xStart)
             draw_theta = 3.14/2 + math.atan2(segments[index].yEnd - segments[index].yStart, segments[index].xEnd - segments[index].xStart)
             robot_x = segments[index].xEnd + 0.2*math.cos(draw_theta)
