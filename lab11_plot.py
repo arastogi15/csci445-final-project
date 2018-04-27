@@ -15,10 +15,10 @@ import lab11_image
 class myLine:
     
     def __init__(self, xStartParam, yStartParam, xEndParam, yEndParam, colorParam, typeParam):
-        self.xStart = xStartParam
-        self.xEnd = xEndParam
-        self.yStart = yStartParam
-        self.yEnd = yEndParam
+        self.xStart = float(xStartParam)
+        self.xEnd = float(xEndParam)
+        self.yStart = float(yStartParam)
+        self.yEnd = float(yEndParam)
         self.color = colorParam
         self.type = typeParam
         self.isCompleted = False
