@@ -44,21 +44,23 @@ class Run:
         # segments = [ [1,0, "red"], [1,1,"red"]]
         
         # START DEBUG
-        # segments = []
-        # iFile = open("hardOutput.txt", "r")
-        # for line in iFile:
-        #     words = line.split()
-        #     myTempLine = myLine(words[0], words[1], words[2], words[3], words[4], words[5])
-        #     segments.append(myTempLine)
-        # for i in segments:
-        #     print(i.xStart, i.yStart, i.xEnd, i.yEnd, i.color, i.type)
+        segments = []
+        iFile = open("hardOutput.txt", "r")
+        for line in iFile:
+            words = line.split()
+            myTempLine = myLine(words[0], words[1], words[2], words[3], words[4], words[5])
+            segments.append(myTempLine)
+        for i in segments:
+            print(i.xStart, i.yStart, i.xEnd, i.yEnd, i.color, i.type)
 
         # END DEBUG
 
+        if len(segments) > 0:
+            firstMove = myLine(0,-0.2,segments[0].xStart, segments[0].yStart, segments[0].color, "line")
+            segments.insert(0,firstMove)
+
         print("START")
         print(self.odometry.x, self.odometry.y)
-        # move_forward = False
-        # move_theta = False
         self.penholder.set_color(0.0, 1.0, 0.0)
         self.penholder.go_to(-0.025)
 
@@ -79,15 +81,18 @@ class Run:
 #         self.isCompleted = False
         
     
-        p1 = myLine(0,-0.2,0,1,"red", "line")
-        p2 = myLine(0,1,1,1,"red", "line")
-        p3 = myLine(1,1,1,0,"red", "line")
-        p4 = myLine(1,0,0,0,"red", "line")
+        # s1 = myLine(0,-0.2,0,1,"red", "line")
+        # s2 = myLine(0,1,1,1,"red", "line")
+        # s3 = myLine(1,1,1,0,"red", "line")
+        # s4 = myLine(1,0,0,0,"red", "line")
 
-        segments = [p1, p2, p3, p4]
+        # segments = [s1, s2, s3, s4]
 
         while self.time.time() < end_time and index < len(segments):
             # DEFINE SOME ANGLE STUFF
+            print("hello")
+            print(segments[index].yEnd - segments[index].yStart)
+            print(segments[index].xEnd - segments[index].xStart)
             draw_theta = 3.14/2 + math.atan2(segments[index].yEnd - segments[index].yStart, segments[index].xEnd - segments[index].xStart)
             robot_x = segments[index].xEnd + 0.2*math.cos(draw_theta)
             robot_y = segments[index].yEnd + 0.2*math.sin(draw_theta)
