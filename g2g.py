@@ -42,14 +42,18 @@ class Run:
         index = 0
         # points = [ [1,0, "red"], [1,1,"blue"], [2,1,"blue"]]
         # points = [ [1,0, "red"], [1,1,"red"]]
-        points = []
-        iFile = open("hardOutput.txt", "r")
-        for line in iFile:
-            words = line.split()
-            myTempLine = myLine(words[0], words[1], words[2], words[3], words[4], words[5])
-            points.append(myTempLine)
-        for i in points:
-            print(i.xStart, i.yStart, i.xEnd, i.yEnd, i.color, i.type)
+        
+        # START DEBUG
+        # points = []
+        # iFile = open("hardOutput.txt", "r")
+        # for line in iFile:
+        #     words = line.split()
+        #     myTempLine = myLine(words[0], words[1], words[2], words[3], words[4], words[5])
+        #     points.append(myTempLine)
+        # for i in points:
+        #     print(i.xStart, i.yStart, i.xEnd, i.yEnd, i.color, i.type)
+
+        # END DEBUG
 
         print("START")
         print(self.odometry.x, self.odometry.y)
@@ -58,8 +62,31 @@ class Run:
         self.penholder.set_color(0.0, 1.0, 0.0)
         self.penholder.go_to(-0.025)
 
-        while self.time.time() < end_time and index < len(points):
+        # SET GAINS!
+        theta_gain = 60
+        dist_gain = 300
 
+
+# class myLine:
+    
+#     def __init__(self, xStartParam, yStartParam, xEndParam, yEndParam, colorParam, typeParam):
+#         self.xStart = xStartParam
+#         self.xEnd = xEndParam
+#         self.yStart = yStartParam
+#         self.yEnd = yEndParam
+#         self.color = colorParam
+#         self.type = typeParam
+#         self.isCompleted = False
+        
+    
+        p1 = myLine(0,0,0,1,"red", "line")
+        p2 = myLine(0,1,1,1,"red", "line")
+        p3 = myLine(1,1,1,0,"red", "line")
+        p4 = myLine(1,0,0,0,"red", "line")
+
+        points = [p1, p2, p3, p4]
+
+        while self.time.time() < end_time and index < len(points):
             state = self.create.update()
             self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
 
@@ -85,41 +112,50 @@ class Run:
             print(self.odometry.y)
             print(self.odometry.theta)
 
-            theta_error = self.odometry.theta - math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) % (2*3.14)
+            # One of these might be wrong...
+            theta_error = (math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta) % (2*3.14)
             dist_error = math.sqrt(math.pow(robot_x - self.odometry.x, 2) + math.pow(robot_y - self.odometry.y, 2))
             print("theta error: %f" % theta_error)
             print("dist error: %f" % dist_error)
 
             # TODO: reduce this range later...
+            print("ROTATING TOWARDS (%f, %f)" % (robot_x, robot_y))
             while abs(theta_error) > 0.15:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
-                print("Target: %f, %f" % (robot_x, robot_y))
-                theta_error = math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta
+                theta_error = (math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta) % (2*3.14)
+                
+                if theta_error <= 3.14:
+                    dir_of_turn = -1
+                else:
+                    dir_of_turn = 1
+
+
                 print("Theta error: %f" % theta_error)
-                clamped_theta_error = max(min(60*theta_error, 100), -100)
+                clamped_theta_error = max(min(theta_gain*theta_error, 100), -100)
                 print("starting rotation")
                 wb = self.penholder.radius*2
                 ratio = self.penholder.length/(self.penholder.length + wb)
                 rw_speed = self.base_speed*ratio
                 lw_speed = self.base_speed
                 # self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
-                if (theta_error < 0):
-                    self.create.drive_direct(rw_speed, lw_speed)
-                else:
-                    self.create.drive_direct(-rw_speed, -lw_speed)
+
+                self.create.drive_direct(dir_of_turn*rw_speed, dir_of_turn*lw_speed)
                 self.time.sleep(0.2)
 
+            print("MOVING TO (%f, %f)" % (robot_x, robot_y))
             while dist_error > 0.1:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 print("dist error: %f" % dist_error)
                 dist_error = math.sqrt(math.pow(robot_x - self.odometry.x, 2) + math.pow(robot_y - self.odometry.y, 2))
-                clamped_dist_error = max(min(300*dist_error, 100), -100)
+                clamped_dist_error = max(min(dist_gain*dist_error, 100), -100)
                 self.create.drive_direct(int(clamped_dist_error), int(clamped_dist_error))
                 self.time.sleep(0.01)
             
 
+            print("QUICK PAUSE! We got to (%f, %f)" % (robot_x, robot_y))
+            self.time.sleep(3)
             if index < len(points)-1 and (points[index].color != points[index+1].color):
                 self.create.drive_direct(0,0)
                 print("COLOR PAUSE!")
