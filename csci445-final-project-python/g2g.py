@@ -19,6 +19,12 @@ class Run:
         self.odometry = odometry.Odometry()
         self.penholder = factory.create_pen_holder()
         self.base_speed = 100
+    
+    def wait(self):
+        end_time = self.time.time() + 0.015
+        while (self.time.time() < end_time):
+            pass
+
 
     def run(self):
         self.create.start()
@@ -62,24 +68,14 @@ class Run:
         print("START")
         print(self.odometry.x, self.odometry.y)
         self.penholder.set_color(0.0, 1.0, 0.0)
-        self.penholder.go_to(-0.025)
+        self.penholder.go_to(-0.045)
 
         # SET GAINS!
-        theta_gain = 0.7
+        theta_gain = 0.5
         dist_gain = 300
 
 
 # class myLine:
-    
-#     def __init__(self, xStartParam, yStartParam, xEndParam, yEndParam, colorParam, typeParam):
-#         self.xStart = xStartParam
-#         self.xEnd = xEndParam
-#         self.yStart = yStartParam
-#         self.yEnd = yEndParam
-#         self.color = colorParam
-#         self.type = typeParam
-#         self.isCompleted = False
-        
     
         # s1 = myLine(0,-0.2,0,1,"red", "line")
         # s2 = myLine(0,1,1,1,"red", "line")
@@ -87,23 +83,23 @@ class Run:
         # s4 = myLine(1,0,0,0,"red", "line")
 
         # segments = [s1, s2, s3, s4]
-
-
-        colorMap = {
+        colorKey = { 
             "blue": [0,0,1],
-            "red": [1,0,0], 
-            "green":[0,1,0], 
-            "black": [0,0,0]
+            "green":[0,1,1],
+            "red":[1,0,0],
+            "black":[0,0,0]
         }
         while index < len(segments):
             if segments[index].color == "none":
                 self.penholder.go_to(0.0)
             else:
-                self.penholder.set_color(colorMap[segments[index].color][0], colorMap[segments[index].color][1], colorMap[segments[index].color][2])
-                self.penholder.go_to(-0.025)
+                self.penholder.set_color(colorKey[segments[index].color][0], colorKey[segments[index].color][1], colorKey[segments[index].color][2])
+                self.penholder.go_to(-0.045)
+
 
             state = self.create.update()
-            self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
+            if state is not None:
+                self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
 
             # DEFINE SOME ANGLE STUFF
             print(segments[index].xEnd - segments[index].xStart)
@@ -148,7 +144,8 @@ class Run:
             print("ROTATING TOWARDS (%f, %f)" % (robot_x, robot_y))
             while abs(theta_error) > 0.02:
                 state = self.create.update()
-                self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
+                if state is not None:
+                    self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 theta_error = (math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta) % (2*3.14)
                 
                 if theta_error <= 3.14:
@@ -160,25 +157,27 @@ class Run:
                 print("Theta error: %f" % theta_error)
                 clamped_theta_error = max(min(theta_gain*theta_error, 100), -100)
                 print("starting rotation")
-                wb = self.penholder.radius*2
-                ratio = self.penholder.length/(self.penholder.length + wb)
+                wb = .232 # fixed length
+                length = 0.04
+                ratio = length/(length + wb)
                 rw_speed = self.base_speed*ratio*theta_gain
                 lw_speed = self.base_speed*theta_gain
                 # self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
 
-                self.create.drive_direct(dir_of_turn*rw_speed, dir_of_turn*lw_speed)
-                self.time.sleep(0.01)
+                self.create.drive_direct(int(dir_of_turn*rw_speed), int(dir_of_turn*lw_speed))
+                self.wait()
 
             print("MOVING ROBOT TO (%f, %f)" % (robot_x, robot_y))
             print("MOVING PEN TO (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
-            while dist_error > 0.05:
+            while dist_error > 0.1:
                 state = self.create.update()
-                self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
+                if state is not None:
+                    self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 print("dist error: %f" % dist_error)
                 dist_error = math.sqrt(math.pow(robot_x - self.odometry.x, 2) + math.pow(robot_y - self.odometry.y, 2))
                 clamped_dist_error = max(min(dist_gain*dist_error, 200), -200)
                 self.create.drive_direct(int(clamped_dist_error), int(clamped_dist_error))
-                self.time.sleep(0.01)
+                self.wait()
             
 
             print("QUICK PAUSE! We got robot: (%f, %f) close to target: (%f, %f)" % (self.odometry.x, self.odometry.y, robot_x, robot_y))
@@ -188,13 +187,13 @@ class Run:
 
 
             # TODO: FIX THIS! LAST ITEM
-            if index < len(segments) and (segments[index].color != segments[index+1].color):
+            if index < len(segments):
                 self.create.drive_direct(0,0)
-                print("COLOR PAUSE!")
-                self.time.sleep(8)
+                if index != len(segments)-1 and (segments[index].color != segments[index+1].color):
+                    print("COLOR PAUSE!")
+                    self.time.sleep(1)
             index += 1
 
-            if segments[index].color == "none":
-                self.penholder.go_to(-0.025)
-
         print("done!") # completed moving through all the items...
+        while True:
+            pass
