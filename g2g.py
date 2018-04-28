@@ -65,7 +65,7 @@ class Run:
         self.penholder.go_to(-0.025)
 
         # SET GAINS!
-        theta_gain = 0.6
+        theta_gain = 0.7
         dist_gain = 300
 
 
@@ -88,21 +88,25 @@ class Run:
 
         # segments = [s1, s2, s3, s4]
 
-        while self.time.time() < end_time and index < len(segments):
+        while index < len(segments):
             if segments[index].color == "none":
                 self.penholder.go_to(0.0)
+            else:
+                self.penholder.go_to(-0.025)
 
+            state = self.create.update()
+            self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
 
             # DEFINE SOME ANGLE STUFF
-            print("hello")
-            print("TARGET: (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
             print(segments[index].xEnd - segments[index].xStart)
             draw_theta = 3.14/2 + math.atan2(segments[index].yEnd - segments[index].yStart, segments[index].xEnd - segments[index].xStart)
             robot_x = segments[index].xEnd + 0.2*math.cos(draw_theta)
             robot_y = segments[index].yEnd + 0.2*math.sin(draw_theta)
 
-            state = self.create.update()
-            self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
+            print("TARGET: (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
+            print("ROBOT TARGET: (%f, %f)" % (robot_x, robot_y))
+
+
 
             if state is None:
                 break
@@ -134,7 +138,7 @@ class Run:
 
             # TODO: reduce this range later...
             print("ROTATING TOWARDS (%f, %f)" % (robot_x, robot_y))
-            while abs(theta_error) > 0.05:
+            while abs(theta_error) > 0.02:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 theta_error = (math.atan2(robot_y - self.odometry.y, robot_x - self.odometry.x) - self.odometry.theta) % (2*3.14)
@@ -155,22 +159,23 @@ class Run:
                 # self.create.drive_direct(int(clamped_theta_error), int(-clamped_theta_error))
 
                 self.create.drive_direct(dir_of_turn*rw_speed, dir_of_turn*lw_speed)
-                self.time.sleep(0.2)
+                self.time.sleep(0.01)
 
             print("MOVING ROBOT TO (%f, %f)" % (robot_x, robot_y))
             print("MOVING PEN TO (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
-            while dist_error > 0.10:
+            while dist_error > 0.05:
                 state = self.create.update()
                 self.odometry.update(state.leftEncoderCounts, state.rightEncoderCounts)
                 print("dist error: %f" % dist_error)
                 dist_error = math.sqrt(math.pow(robot_x - self.odometry.x, 2) + math.pow(robot_y - self.odometry.y, 2))
-                clamped_dist_error = max(min(dist_gain*dist_error, 100), -100)
+                clamped_dist_error = max(min(dist_gain*dist_error, 200), -200)
                 self.create.drive_direct(int(clamped_dist_error), int(clamped_dist_error))
                 self.time.sleep(0.01)
             
 
             print("QUICK PAUSE! We got robot: (%f, %f) close to target: (%f, %f)" % (self.odometry.x, self.odometry.y, robot_x, robot_y))
             print("QUICK PAUSE! We got pen to (%f, %f)" % (segments[index].xEnd, segments[index].yEnd))
+            # self.create.drive_direct(0,0)
             self.time.sleep(3)
 
 
@@ -182,6 +187,6 @@ class Run:
             index += 1
 
             if segments[index].color == "none":
-                self.penholder.go_to(0.0)
+                self.penholder.go_to(-0.025)
 
         print("done!") # completed moving through all the items...
